@@ -30,6 +30,8 @@ jobs:
         with:
           node-version: "20"
       - name: Build Vue App
+        env:
+          VITE_TMDB_TOKEN: ${{ secrets.VITE_TMDB_TOKEN }}
         run: |
           npm ci
           npm run build
