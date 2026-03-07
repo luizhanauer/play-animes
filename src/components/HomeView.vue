@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 pb-8">
+  <div class="p-4 pb-8 max-w-7xl mx-auto">
     <header class="mb-6 text-center">
       <h1 class="text-3xl font-bold text-blue-400 tracking-tight">Play Animes</h1>
       <p class="text-sm text-gray-400 mt-1">
@@ -7,7 +7,7 @@
       </p>
     </header>
 
-    <div class="relative mb-6">
+    <div class="relative mb-6 max-w-2xl mx-auto">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -31,17 +31,17 @@
       </button>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
       <div 
         v-for="anime in animes" 
         :key="anime.id"
         @click="$emit('select', anime.id)"
-        class="relative bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700/50 cursor-pointer transition-transform active:scale-95 flex flex-col h-full"
+        class="relative bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700/50 cursor-pointer transition-transform active:scale-95 flex flex-col h-full group hover:border-gray-500"
       >
         <img 
           :src="getImageUrl(anime.poster_path)" 
           :alt="anime.name" 
-          class="w-full aspect-[2/3] object-cover bg-gray-900"
+          class="w-full aspect-[2/3] object-cover bg-gray-900 group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
         <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded-md flex items-center gap-1">
@@ -50,8 +50,8 @@
           </svg>
           <span class="text-xs font-bold text-white">{{ (anime.vote_average || 0).toFixed(1) }}</span>
         </div>
-        <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-gray-900 via-gray-900/90 to-transparent p-3 pt-10">
-          <h2 class="text-sm font-bold text-white truncate drop-shadow-md">{{ anime.name }}</h2>
+        <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-gray-900 via-gray-900/90 to-transparent p-3 pt-12">
+          <h2 class="text-sm font-bold text-white truncate drop-shadow-md group-hover:text-blue-400 transition-colors">{{ anime.name }}</h2>
         </div>
       </div>
     </div>
