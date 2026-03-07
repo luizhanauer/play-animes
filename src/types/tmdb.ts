@@ -28,13 +28,35 @@ export interface Episode {
   vote_average: number;
 }
 
+// --- Tipagens do Play Media (Seu JSON do GitHub Pages) ---
+export interface PlayMediaEpisode {
+  episode_number: number;
+  stream_id: string;
+}
+
+export interface PlayMediaSeason {
+  season_number: number;
+  episodes: PlayMediaEpisode[];
+}
+
+export interface PlayMediaCatalog {
+  anime_id: number;
+  provider: string;
+  seasons: PlayMediaSeason[];
+}
+
+// --- Tipagens de Agregação (UI) ---
+export interface MappedEpisode extends Episode {
+  stream_id?: string;
+}
+
 export interface WebAppPayload {
   action: string;
   animeId: string;
   epId: string;
+  streamId?: string;
 }
 
-// Resposta paginada padrão do TMDB
 export interface PaginatedResponse<T> {
   page: number;
   results: T[];

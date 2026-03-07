@@ -3,32 +3,32 @@
     <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
   </div>
 
-  <div v-if="!isLoading && anime" class="pb-8">
-    <div class="relative w-full h-64">
+  <div v-if="!isLoading && anime" class="pb-8 max-w-7xl mx-auto">
+    <div class="relative w-full h-64 sm:h-80 md:h-96 rounded-b-3xl overflow-hidden shadow-2xl">
       <img 
-        :src="getImageUrl(anime.backdrop_path || anime.poster_path, 'w780')" 
+        :src="getImageUrl(anime.backdrop_path || anime.poster_path, 'w1280')" 
         class="w-full h-full object-cover opacity-60"
       />
-      <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
       
       <button 
         @click="$emit('back')" 
-        class="absolute top-4 left-4 bg-black/50 p-2 rounded-full backdrop-blur-md active:scale-95 transition-transform"
+        class="absolute top-4 left-4 bg-black/50 p-2 rounded-full backdrop-blur-md active:scale-95 transition-transform hover:bg-black/70"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
-      <div class="absolute bottom-4 left-4 right-4 flex items-end gap-4">
+      <div class="absolute bottom-4 left-4 right-4 flex items-end gap-4 md:gap-6 md:left-8 md:bottom-8">
         <img 
-          :src="getImageUrl(anime.poster_path, 'w200')" 
-          class="w-24 rounded-lg shadow-xl border border-gray-700"
+          :src="getImageUrl(anime.poster_path, 'w300')" 
+          class="w-24 md:w-32 rounded-lg shadow-xl border border-gray-700/80"
         />
         <div class="flex-1 pb-1">
-          <h1 class="text-2xl font-bold leading-tight mb-1 text-white">{{ anime.name }}</h1>
-          <div class="flex items-center gap-2 text-xs font-semibold">
-            <span class="bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded flex items-center gap-1">
+          <h1 class="text-2xl md:text-4xl font-bold leading-tight mb-2 text-white drop-shadow-lg">{{ anime.name }}</h1>
+          <div class="flex items-center gap-2 text-xs md:text-sm font-semibold">
+            <span class="bg-yellow-500/20 text-yellow-400 px-2.5 py-1 rounded-md flex items-center gap-1 backdrop-blur-sm">
               IMDb {{ anime.vote_average.toFixed(1) }}
             </span>
           </div>
@@ -36,35 +36,51 @@
       </div>
     </div>
 
-    <div class="p-4 space-y-6">
-      <p class="text-sm text-gray-300 leading-relaxed line-clamp-4">
+    <div class="p-4 md:p-8 md:pt-6 space-y-6 md:space-y-8">
+      <p class="text-sm md:text-base text-gray-300 leading-relaxed md:w-3/4">
         {{ anime.overview || 'Nenhuma descrição disponível.' }}
       </p>
 
       <section>
-        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Episódios (T1)</h3>
+        <h3 class="text-sm md:text-base font-semibold text-gray-400 uppercase tracking-wider mb-4 md:mb-6 border-b border-gray-800 pb-2">
+          Episódios (T{{ targetSeasonNumber }})
+        </h3>
         
-        <div class="space-y-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div
-            v-for="ep in episodes"
+            v-for="ep in mappedEpisodes"
             :key="ep.id"
-            @click="watchEpisode(ep.id)"
-            class="flex items-center gap-3 bg-gray-800 p-2 rounded-xl border border-gray-700/50 active:bg-gray-700 transition-colors cursor-pointer"
+            class="flex items-center gap-3 md:gap-4 bg-gray-800 p-2.5 rounded-xl border border-gray-700/50 hover:border-gray-600 transition-colors group"
           >
             <img 
               :src="getImageUrl(ep.still_path, 'w300')" 
-              class="w-28 h-16 object-cover rounded-lg bg-gray-900"
+              class="w-28 md:w-36 h-16 md:h-20 object-cover rounded-lg bg-gray-900 shadow-inner"
             />
-            <div class="flex-1 min-w-0">
-              <h4 class="text-sm font-bold text-gray-100 truncate">{{ ep.episode_number }}. {{ ep.name }}</h4>
-              <div class="flex items-center gap-2 text-[10px] text-gray-400 mt-1 font-medium">
+            <div class="flex-1 min-w-0 flex flex-col justify-center h-full py-1">
+              <h4 class="text-sm md:text-base font-bold text-gray-100 truncate group-hover:text-blue-400 transition-colors">
+                {{ ep.episode_number }}. {{ ep.name }}
+              </h4>
+              
+              <div class="flex items-center gap-2 text-[10px] md:text-xs text-gray-400 mt-1 font-medium w-full">
                 <span v-if="ep.air_date">{{ formatDate(ep.air_date) }}</span>
                 <span v-if="ep.air_date && ep.runtime">•</span>
                 <span v-if="ep.runtime">{{ ep.runtime }} min</span>
-                <span v-if="ep.vote_average > 0" class="flex items-center text-yellow-500 ml-auto">
+                
+                <span v-if="ep.vote_average > 0" class="flex items-center text-yellow-500 ml-auto font-bold bg-yellow-500/10 px-1.5 py-0.5 rounded">
                   ★ {{ ep.vote_average.toFixed(1) }}
                 </span>
               </div>
+              
+              <button
+                v-if="ep.stream_id"
+                @click="watchEpisode(ep.episode_number, ep.stream_id)"
+                class="mt-2.5 bg-blue-600/90 hover:bg-blue-500 text-white text-xs md:text-sm font-bold py-1.5 md:py-2 px-4 rounded-md shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1.5 w-fit"
+              >
+                Assistir
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 md:h-4 md:w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -74,29 +90,58 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { fetchAnimeDetails, fetchEpisodes, getImageUrl } from '../services/api';
-import type { AnimeDetail, Episode, WebAppPayload } from '../types/tmdb';
+import { ref, onMounted, computed } from 'vue';
+import { fetchAnimeDetails, fetchEpisodes, fetchPlayMediaCatalog, getImageUrl } from '../services/api';
+import type { AnimeDetail, Episode, PlayMediaCatalog, MappedEpisode, WebAppPayload } from '../types/tmdb';
 
 const props = defineProps<{ animeId: number }>();
 const emit = defineEmits<{ (e: 'back'): void }>();
 
 const anime = ref<AnimeDetail | null>(null);
-const episodes = ref<Episode[]>([]);
+const tmdbEpisodes = ref<Episode[]>([]);
+const playMediaCatalog = ref<PlayMediaCatalog | null>(null);
 const isLoading = ref<boolean>(true);
+const targetSeasonNumber = ref<number>(1);
+
+const mappedEpisodes = computed<MappedEpisode[]>(() => {
+  return tmdbEpisodes.value.map((ep) => {
+    return {
+      ...ep,
+      stream_id: getStreamId(ep.episode_number)
+    };
+  });
+});
+
+const getStreamId = (epNumber: number): string | undefined => {
+  if (!playMediaCatalog.value) return undefined;
+  
+  const season = playMediaCatalog.value.seasons.find(s => s.season_number === targetSeasonNumber.value);
+  if (!season) return undefined;
+
+  const episode = season.episodes.find(e => e.episode_number === epNumber);
+  if (!episode) return undefined;
+
+  return episode.stream_id;
+};
 
 const loadDetails = async (): Promise<void> => {
-  anime.value = await fetchAnimeDetails(props.animeId);
+  const [animeData, catalogData] = await Promise.all([
+    fetchAnimeDetails(props.animeId),
+    fetchPlayMediaCatalog(props.animeId)
+  ]);
   
+  anime.value = animeData;
+  playMediaCatalog.value = catalogData;
+
   if (!anime.value) {
     isLoading.value = false;
     return;
   }
 
   const validSeason = anime.value.seasons.find(s => s.season_number > 0);
-  const targetSeason = validSeason ? validSeason.season_number : 1;
+  targetSeasonNumber.value = validSeason ? validSeason.season_number : 1;
 
-  episodes.value = await fetchEpisodes(props.animeId, targetSeason);
+  tmdbEpisodes.value = await fetchEpisodes(props.animeId, targetSeasonNumber.value);
   isLoading.value = false;
 };
 
@@ -105,7 +150,7 @@ const formatDate = (dateString: string): string => {
   return date.toLocaleDateString('pt-BR');
 };
 
-const watchEpisode = (epId: number): void => {
+const watchEpisode = (epNumber: number, streamId: string): void => {
   const tg = window.Telegram?.WebApp;
   
   if (!tg || !tg.sendData) {
@@ -116,7 +161,8 @@ const watchEpisode = (epId: number): void => {
   const payload: WebAppPayload = {
     action: "WATCH",
     animeId: props.animeId.toString(),
-    epId: epId.toString()
+    epId: epNumber.toString(),
+    streamId: streamId
   };
 
   tg.HapticFeedback.notificationOccurred('success');

@@ -1,5 +1,4 @@
-// src/services/api.ts
-import type { Anime, AnimeDetail, Episode, PaginatedResponse } from '../types/tmdb';
+import type { Anime, AnimeDetail, Episode, PaginatedResponse, PlayMediaCatalog } from '../types/tmdb';
 
 const TMDB_URL = 'https://api.themoviedb.org/3';
 const TOKEN = import.meta.env.VITE_TMDB_TOKEN;
@@ -9,11 +8,9 @@ const headers = {
   accept: 'application/json',
 };
 
-// Image Builder Pattern
+// Image Builder Pattern com Fallback para 404 (http.cat)
 export const getImageUrl = (path: string | null, width: string = 'w500'): string => {
-  // Guard clause para fallback padronizado em caso de imagem ausente no TMDB
   if (!path) return 'https://http.cat/404';
-  
   return `https://image.tmdb.org/t/p/${width}${path}`;
 };
 
@@ -44,7 +41,6 @@ export const searchAnimes = async (query: string, page: number = 1): Promise<Pag
 
     const data = (await res.json()) as PaginatedResponse<Anime>;
     
-    // Filtro rigoroso: Apenas animações (16) de origem japonesa ('ja')
     const onlyAnimes = data.results.filter(
       (item) => item.original_language === 'ja' && item.genre_ids.includes(16)
     );
@@ -81,5 +77,20 @@ export const fetchEpisodes = async (seriesId: number, seasonNumber: number): Pro
   } catch (error) {
     console.error(error);
     return [];
+  }
+};
+
+// Consumo do Catálogo Próprio (JSON)
+export const fetchPlayMediaCatalog = async (animeId: number): Promise<PlayMediaCatalog | null> => {
+  try {
+    const res = await fetch(`https://luizhanauer.github.io/play-media/${animeId}.json`);
+    
+    // Boundary Protection: Retorno silencioso (sem erro fatal) se o JSON não existir
+    if (!res.ok) return null;
+    
+    return await res.json() as PlayMediaCatalog;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 };
