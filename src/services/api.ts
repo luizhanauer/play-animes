@@ -1,3 +1,4 @@
+// src/services/api.ts
 import type { Anime, AnimeDetail, Episode, PaginatedResponse, PlayMediaCatalog } from '../types/tmdb';
 
 const TMDB_URL = 'https://api.themoviedb.org/3';
@@ -80,10 +81,10 @@ export const fetchEpisodes = async (seriesId: number, seasonNumber: number): Pro
   }
 };
 
-// Consumo do Catálogo Próprio (JSON)
+// Consumo do Catálogo Próprio (JSON) flexibilizado com a nova estrutura de rotas
 export const fetchPlayMediaCatalog = async (animeId: number): Promise<PlayMediaCatalog | null> => {
   try {
-    const res = await fetch(`https://luizhanauer.github.io/play-media/${animeId}.json`);
+    const res = await fetch(`https://luizhanauer.github.io/play-media/${animeId}/episodes.json`);
     
     // Boundary Protection: Retorno silencioso (sem erro fatal) se o JSON não existir
     if (!res.ok) return null;
