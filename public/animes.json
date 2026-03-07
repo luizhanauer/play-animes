@@ -1,0 +1,22 @@
+[
+  {
+    "id": "anime-teste-01",
+    "title": "Aventuras no Telegram",
+    "status": "Finalizado",
+    "coverUrl": "https://via.placeholder.com/300x400",
+    "episodes": [
+      { "id": "ep-01-start", "number": 1, "title": "O Início" },
+      { "id": "ep-02-next", "number": 2, "title": "A Continuação" },
+      { "id": "ep-03-end", "number": 3, "title": "O Fim" }
+    ]
+  },
+  {
+    "id": "anime-teste-02",
+    "title": "Jornada do Código",
+    "status": "Lançamento",
+    "coverUrl": "https://via.placeholder.com/300x400",
+    "episodes": [
+      { "id": "ep-01-beta", "number": 1, "title": "Compilando" }
+    ]
+  }
+]
