@@ -32,7 +32,7 @@ jobs:
       - name: Build Vue App
         env:
           VITE_TMDB_TOKEN: ${{ secrets.VITE_TMDB_TOKEN }}
-          VITE_ADMIN_TELEGRAM_ID: ${{ vars.VITE_ADMIN_TELEGRAM_ID }}
+          VITE_ADMIN_TELEGRAM_ID: ${{ secrets.VITE_ADMIN_TELEGRAM_ID }}
         run: |
           npm ci
           npm run build
