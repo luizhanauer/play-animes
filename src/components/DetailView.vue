@@ -123,24 +123,24 @@ const ADMIN_ID = import.meta.env.VITE_ADMIN_TELEGRAM_ID;
 const checkAdminStatus = () => {
   const tg = window.Telegram?.WebApp;
   
-  // Log 1: O que o Vite injetou na variável de ambiente
-  console.log("[Debug] VITE_ADMIN_TELEGRAM_ID configurado:", ADMIN_ID);
+  // Log 1: Verifica o que o build injetou (deve mostrar seu ID se o YAML for corrigido)
+  console.log("[Debug] ENV ADMIN_ID:", ADMIN_ID);
+
+  // Log 2: Verifica o objeto completo do Telegram
+  console.log("[Debug] Full initDataUnsafe:", tg?.initDataUnsafe);
 
   if (tg?.initDataUnsafe?.user) {
     const userId = tg.initDataUnsafe.user.id.toString();
-    
-    // Log 2: O ID que o Telegram está entregando agora
-    console.log("[Debug] Seu ID atual no Telegram:", userId);
+    console.log("[Debug] Seu ID detectado:", userId);
 
-    // Comparação com tratamento de strings
+    // Comparação robusta
     const isMatched = userId.trim() === ADMIN_ID?.toString().trim();
-    
-    // Log 3: Resultado da comparação
-    console.log("[Debug] Comparação:", `${userId} === ${ADMIN_ID} ->`, isMatched);
+    console.log("[Debug] Match?", isMatched);
 
     isAdmin.value = isMatched;
   } else {
-    console.warn("[Debug] Objeto user não encontrado no initDataUnsafe.");
+    // Se cair aqui, o Telegram não enviou dados de usuário
+    console.error("[Debug] Erro: Objeto 'user' ausente. Você está abrindo o app por um botão de bot?");
   }
 };
 
