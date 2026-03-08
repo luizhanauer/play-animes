@@ -1,13 +1,4 @@
 <template>
-  <div
-    class="fixed top-0 left-0 right-0 z-[100] bg-red-600/90 text-white text-[10px] p-1 text-center font-mono shadow-lg"
-    v-if="!isAdmin"
-  >
-    DEBUG: Detectado [{{ currentUserId || "NADA" }}] vs Esperado [{{
-      ADMIN_ID
-    }}]
-  </div>
-
   <div v-if="isLoading" class="flex justify-center items-center h-screen">
     <div
       class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"
@@ -189,7 +180,6 @@ const anime = ref<AnimeDetail | null>(null);
 const tmdbEpisodes = ref<Episode[]>([]);
 const playMediaCatalog = ref<PlayMediaCatalog | null>(null);
 const isLoading = ref<boolean>(true);
-const currentUserId = ref<string>("");
 const targetSeasonNumber = ref<number>(1);
 
 // Flag de Admin (A validação real ocorre no Bot Go)
@@ -197,30 +187,20 @@ const isAdmin = ref<boolean>(false);
 
 const ADMIN_ID = import.meta.env.VITE_ADMIN_TELEGRAM_ID;
 
-const checkAdminStatus = () => {
+const checkAdminStatus = (): void => {
   const tg = window.Telegram?.WebApp;
+  const user = tg?.initDataUnsafe?.user;
 
-  // Log 1: Verifica o que o build injetou (deve mostrar seu ID se o YAML for corrigido)
-  console.log("[Debug] ENV ADMIN_ID:", ADMIN_ID);
-
-  // Log 2: Verifica o objeto completo do Telegram
-  console.log("[Debug] Full initDataUnsafe:", tg?.initDataUnsafe);
-
-  if (tg?.initDataUnsafe?.user) {
-    const userId = tg.initDataUnsafe.user.id.toString();
-    console.log("[Debug] Seu ID detectado:", userId);
-
-    // Comparação robusta
-    const isMatched = userId.trim() === ADMIN_ID?.toString().trim();
-    console.log("[Debug] Match?", isMatched);
-
-    isAdmin.value = isMatched;
-  } else {
-    // Se cair aqui, o Telegram não enviou dados de usuário
-    console.error(
-      "[Debug] Erro: Objeto 'user' ausente. Você está abrindo o app por um botão de bot?",
-    );
+  // Cláusula de guarda: Se não houver usuário, garante falso e encerra a execução
+  if (!user) {
+    isAdmin.value = false;
+    return;
   }
+
+  const userId: string = user.id.toString().trim();
+  const adminId: string = ADMIN_ID?.toString().trim() ?? "";
+
+  isAdmin.value = userId === adminId;
 };
 
 // Composição de Dados: Mescla o TMDB com o Catálogo Local
