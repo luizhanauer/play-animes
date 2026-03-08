@@ -1,11 +1,35 @@
 <template>
   <div class="p-4 pb-8 max-w-7xl mx-auto">
-    <header class="mb-6 text-center">
-      <h1 class="text-3xl font-bold text-blue-400 tracking-tight">Play Animes</h1>
+    <header class="mb-6 text-center select-none">
+      <h1 
+        @click="handleTitleClick"
+        class="text-3xl font-bold text-blue-400 tracking-tight cursor-pointer"
+      >
+        Play Animes
+      </h1>
       <p class="text-sm text-gray-400 mt-1">
         {{ isSearching ? `Resultados para "${searchQuery}"` : 'Populares no momento' }}
       </p>
     </header>
+
+    <div v-if="showAdminPanel" class="max-w-2xl mx-auto mb-6 bg-gray-800 p-4 rounded-xl border border-purple-500/50 shadow-lg">
+      <label class="block text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">Chave de Mapeamento (Admin)</label>
+      <div class="flex gap-2">
+        <input
+          v-model="adminKeyInput"
+          type="password"
+          placeholder="Insira a chave secreta..."
+          class="flex-1 px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500 transition-colors"
+        />
+        <button 
+          @click="saveAdminKey"
+          class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all active:scale-95"
+        >
+          Salvar
+        </button>
+      </div>
+      <p class="text-[10px] text-gray-500 mt-2">*A chave é armazenada apenas no cache deste dispositivo.</p>
+    </div>
 
     <div class="relative mb-6 max-w-2xl mx-auto">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -80,11 +104,55 @@ const totalPages = ref<number>(1);
 const searchQuery = ref<string>('');
 const searchTimeout = ref<number | null>(null);
 
+// Admin States
+const clickCount = ref<number>(0);
+const clickTimeout = ref<number | null>(null);
+const showAdminPanel = ref<boolean>(false);
+const adminKeyInput = ref<string>('');
+
 const sentinel = ref<HTMLElement | null>(null);
 let observer: IntersectionObserver | null = null;
 
 const isSearching = computed((): boolean => searchQuery.value.trim().length > 0);
 const hasMorePages = computed((): boolean => currentPage.value < totalPages.value);
+
+// Lógica Funcional do Easter Egg (Sem else)
+const handleTitleClick = (): void => {
+  clickCount.value++;
+  
+  if (clickTimeout.value !== null) {
+    clearTimeout(clickTimeout.value);
+  }
+
+  // Cast para window.setTimeout
+  clickTimeout.value = window.setTimeout(() => {
+    clickCount.value = 0;
+  }, 1000);
+
+  if (clickCount.value >= 5) {
+    showAdminPanel.value = !showAdminPanel.value;
+    adminKeyInput.value = localStorage.getItem('PLAY_ANIMES_ADMIN_KEY') || '';
+    clickCount.value = 0;
+  }
+};
+
+const saveAdminKey = (): void => {
+  const key = adminKeyInput.value.trim();
+  
+  if (!key) {
+    localStorage.removeItem('PLAY_ANIMES_ADMIN_KEY');
+    showAdminPanel.value = false;
+    return;
+  }
+
+  localStorage.setItem('PLAY_ANIMES_ADMIN_KEY', key);
+  showAdminPanel.value = false;
+  
+  const tg = window.Telegram?.WebApp;
+  if (tg?.HapticFeedback) {
+    tg.HapticFeedback.notificationOccurred('success');
+  }
+};
 
 const loadData = async (reset: boolean = false): Promise<void> => {
   if (isLoading.value) return;
@@ -138,7 +206,6 @@ const setupObserver = (): void => {
   observer = new IntersectionObserver((entries) => {
     const target = entries[0];
     
-    // Boundary Protection: Validando o IntersectionObserverEntry estritamente
     if (!target) return;
     if (!target.isIntersecting) return;
     if (!hasMorePages.value) return;

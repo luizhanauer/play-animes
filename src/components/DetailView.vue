@@ -1,59 +1,36 @@
 <template>
   <div v-if="isLoading" class="flex justify-center items-center h-screen">
-    <div
-      class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"
-    ></div>
+    <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
   </div>
 
   <div v-if="!isLoading && anime" class="pb-8 max-w-7xl mx-auto">
-    <div
-      class="relative w-full h-64 sm:h-80 md:h-96 rounded-b-3xl overflow-hidden shadow-2xl"
-    >
+    <div class="relative w-full h-64 sm:h-80 md:h-96 rounded-b-3xl overflow-hidden shadow-2xl">
       <img
         :src="getImageUrl(anime.backdrop_path || anime.poster_path, 'w1280')"
         class="w-full h-full object-cover opacity-60"
       />
-      <div
-        class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"
-      ></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
 
       <button
         @click="$emit('back')"
         class="absolute top-4 left-4 bg-black/50 p-2 rounded-full backdrop-blur-md active:scale-95 transition-transform hover:bg-black/70"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
-      <div
-        class="absolute bottom-4 left-4 right-4 flex items-end gap-4 md:gap-6 md:left-8 md:bottom-8"
-      >
+      <div class="absolute bottom-4 left-4 right-4 flex items-end gap-4 md:gap-6 md:left-8 md:bottom-8">
         <img
           :src="getImageUrl(anime.poster_path, 'w300')"
           class="w-24 md:w-32 rounded-lg shadow-xl border border-gray-700/80"
         />
         <div class="flex-1 pb-1">
-          <h1
-            class="text-2xl md:text-4xl font-bold leading-tight mb-2 text-white drop-shadow-lg"
-          >
+          <h1 class="text-2xl md:text-4xl font-bold leading-tight mb-2 text-white drop-shadow-lg">
             {{ anime.name }}
           </h1>
           <div class="flex items-center gap-2 text-xs md:text-sm font-semibold">
-            <span
-              class="bg-yellow-500/20 text-yellow-400 px-2.5 py-1 rounded-md flex items-center gap-1 backdrop-blur-sm"
-            >
+            <span class="bg-yellow-500/20 text-yellow-400 px-2.5 py-1 rounded-md flex items-center gap-1 backdrop-blur-sm">
               IMDb {{ anime.vote_average.toFixed(1) }}
             </span>
           </div>
@@ -67,9 +44,7 @@
       </p>
 
       <section>
-        <h3
-          class="text-sm md:text-base font-semibold text-gray-400 uppercase tracking-wider mb-4 md:mb-6 border-b border-gray-800 pb-2"
-        >
+        <h3 class="text-sm md:text-base font-semibold text-gray-400 uppercase tracking-wider mb-4 md:mb-6 border-b border-gray-800 pb-2">
           Episódios (T{{ targetSeasonNumber }})
         </h3>
 
@@ -83,24 +58,15 @@
               :src="getImageUrl(ep.still_path, 'w300')"
               class="w-28 md:w-36 h-16 md:h-20 object-cover rounded-lg bg-gray-900 shadow-inner"
             />
-            <div
-              class="flex-1 min-w-0 flex flex-col justify-center h-full py-1"
-            >
-              <h4
-                class="text-sm md:text-base font-bold text-gray-100 truncate group-hover:text-blue-400 transition-colors"
-              >
+            <div class="flex-1 min-w-0 flex flex-col justify-center h-full py-1">
+              <h4 class="text-sm md:text-base font-bold text-gray-100 truncate group-hover:text-blue-400 transition-colors">
                 {{ ep.episode_number }}. {{ ep.name }}
               </h4>
 
-              <div
-                class="flex items-center gap-2 text-[10px] md:text-xs text-gray-400 mt-1 font-medium w-full"
-              >
+              <div class="flex items-center gap-2 text-[10px] md:text-xs text-gray-400 mt-1 font-medium w-full">
                 <span v-if="ep.air_date">{{ formatDate(ep.air_date) }}</span>
                 <span v-if="ep.air_date && ep.vote_average > 0">•</span>
-                <span
-                  v-if="ep.vote_average > 0"
-                  class="flex items-center text-yellow-500 font-bold"
-                >
+                <span v-if="ep.vote_average > 0" class="flex items-center text-yellow-500 font-bold">
                   ★ {{ ep.vote_average.toFixed(1) }}
                 </span>
               </div>
@@ -112,39 +78,19 @@
                   class="bg-blue-600/90 hover:bg-blue-500 text-white text-xs md:text-sm font-bold py-1.5 md:py-2 px-4 rounded-md shadow-sm transition-all active:scale-95 flex items-center gap-1.5"
                 >
                   Assistir
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-3 w-3 md:h-4 md:w-4"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                      clip-rule="evenodd"
-                    />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 md:h-4 md:w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
                   </svg>
                 </button>
 
                 <button
-                  v-if="isAdmin"
+                  v-if="adminKey"
                   @click="prepareMapping(ep.episode_number)"
                   class="bg-purple-600/90 hover:bg-purple-500 text-white text-xs md:text-sm font-bold py-1.5 md:py-2 px-4 rounded-md shadow-sm transition-all active:scale-95 flex items-center gap-1.5 border border-purple-400/30"
                 >
                   Mapear
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-3 w-3 md:h-4 md:w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                 </button>
               </div>
@@ -180,23 +126,18 @@ const tmdbEpisodes = ref<Episode[]>([]);
 const playMediaCatalog = ref<PlayMediaCatalog | null>(null);
 const isLoading = ref<boolean>(true);
 const targetSeasonNumber = ref<number>(1);
-const isAdmin = ref<boolean>(false);
+const adminKey = ref<string | null>(null);
 
-const ADMIN_ID = import.meta.env.VITE_ADMIN_TELEGRAM_ID;
-
-const checkAdminStatus = (): void => {
-  const tg = window.Telegram?.WebApp;
-  const user = tg?.initDataUnsafe?.user;
-
-  if (!user) {
-    isAdmin.value = false;
+// Substitui a verificação de env por leitura de cache
+const loadAdminKey = (): void => {
+  const storedKey = localStorage.getItem('PLAY_ANIMES_ADMIN_KEY');
+  
+  if (!storedKey) {
+    adminKey.value = null;
     return;
   }
 
-  const userId: string = user.id.toString().trim();
-  const adminId: string = ADMIN_ID?.toString().trim() ?? "";
-
-  isAdmin.value = userId === adminId;
+  adminKey.value = storedKey;
 };
 
 const mappedEpisodes = computed<MappedEpisode[]>(() => {
@@ -264,26 +205,26 @@ const watchEpisode = (epNumber: number, streamId: string): void => {
 
   tg.HapticFeedback.notificationOccurred("success");
   tg.sendData(JSON.stringify(payload));
-
-  // Fechamento explícito após o envio do payload, mantendo o padrão do Mapear
   setTimeout(() => tg.close(), 150);
 };
 
 const prepareMapping = (epNumber: number): void => {
   const tg = window.Telegram?.WebApp;
+  const currentKey = adminKey.value;
 
-  if (!tg?.sendData) return;
+  if (!tg?.sendData || !currentKey) return;
 
-  const payload = {
+  // Injetando a chave no payload para o Go validar
+  const payload: WebAppPayload = {
     action: "START_MAPPING",
     animeId: props.animeId.toString(),
     season: targetSeasonNumber.value,
     episode: epNumber,
+    adminKey: currentKey
   };
 
   tg.HapticFeedback.impactOccurred("medium");
   tg.sendData(JSON.stringify(payload));
-
   setTimeout(() => tg.close(), 150);
 };
 
@@ -291,7 +232,7 @@ onMounted(() => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
     tg.ready();
-    checkAdminStatus();
+    loadAdminKey();
   }
   loadDetails();
 });
