@@ -175,14 +175,11 @@ import type {
 const props = defineProps<{ animeId: number }>();
 defineEmits<{ (e: "back"): void }>();
 
-// Estados Reativos
 const anime = ref<AnimeDetail | null>(null);
 const tmdbEpisodes = ref<Episode[]>([]);
 const playMediaCatalog = ref<PlayMediaCatalog | null>(null);
 const isLoading = ref<boolean>(true);
 const targetSeasonNumber = ref<number>(1);
-
-// Flag de Admin (A validação real ocorre no Bot Go)
 const isAdmin = ref<boolean>(false);
 
 const ADMIN_ID = import.meta.env.VITE_ADMIN_TELEGRAM_ID;
@@ -191,7 +188,6 @@ const checkAdminStatus = (): void => {
   const tg = window.Telegram?.WebApp;
   const user = tg?.initDataUnsafe?.user;
 
-  // Cláusula de guarda: Se não houver usuário, garante falso e encerra a execução
   if (!user) {
     isAdmin.value = false;
     return;
@@ -203,7 +199,6 @@ const checkAdminStatus = (): void => {
   isAdmin.value = userId === adminId;
 };
 
-// Composição de Dados: Mescla o TMDB com o Catálogo Local
 const mappedEpisodes = computed<MappedEpisode[]>(() => {
   return tmdbEpisodes.value.map((ep) => ({
     ...ep,
@@ -211,7 +206,6 @@ const mappedEpisodes = computed<MappedEpisode[]>(() => {
   }));
 });
 
-// Busca o Stream ID ofuscado no JSON do GitHub Pages
 const getStreamId = (epNumber: number): string | undefined => {
   if (!playMediaCatalog.value) return undefined;
 
@@ -224,7 +218,6 @@ const getStreamId = (epNumber: number): string | undefined => {
   return episode?.stream_id;
 };
 
-// Carregamento Atômico de Dados
 const loadDetails = async (): Promise<void> => {
   const [animeData, catalogData] = await Promise.all([
     fetchAnimeDetails(props.animeId),
@@ -239,7 +232,6 @@ const loadDetails = async (): Promise<void> => {
     return;
   }
 
-  // Prioriza a primeira temporada disponível que não seja a 0 (especiais)
   const validSeason = anime.value.seasons.find((s) => s.season_number > 0);
   targetSeasonNumber.value = validSeason ? validSeason.season_number : 1;
 
@@ -250,16 +242,11 @@ const loadDetails = async (): Promise<void> => {
   isLoading.value = false;
 };
 
-// Formatação de Data seguindo padrão local
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
   return date.toLocaleDateString("pt-BR");
 };
 
-/**
- * Ação: Assistir
- * Envia o payload WATCH para o bot entregar o arquivo do grupo privado
- */
 const watchEpisode = (epNumber: number, streamId: string): void => {
   const tg = window.Telegram?.WebApp;
 
@@ -277,12 +264,11 @@ const watchEpisode = (epNumber: number, streamId: string): void => {
 
   tg.HapticFeedback.notificationOccurred("success");
   tg.sendData(JSON.stringify(payload));
+
+  // Fechamento explícito após o envio do payload, mantendo o padrão do Mapear
+  setTimeout(() => tg.close(), 150);
 };
 
-/**
- * Ação Admin: Mapear
- * Sinaliza ao bot que o próximo vídeo recebido no chat será deste episódio
- */
 const prepareMapping = (epNumber: number): void => {
   const tg = window.Telegram?.WebApp;
 
@@ -298,7 +284,6 @@ const prepareMapping = (epNumber: number): void => {
   tg.HapticFeedback.impactOccurred("medium");
   tg.sendData(JSON.stringify(payload));
 
-  // Fecha o Mini App para permitir o upload no chat
   setTimeout(() => tg.close(), 150);
 };
 
@@ -306,7 +291,6 @@ onMounted(() => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
     tg.ready();
-    // Força o Telegram a atualizar os dados
     checkAdminStatus();
   }
   loadDetails();
