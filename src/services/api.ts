@@ -1,4 +1,3 @@
-// src/services/api.ts
 import type { Anime, AnimeDetail, Episode, PaginatedResponse, PlayMediaCatalog } from '../types/tmdb';
 
 const TMDB_URL = 'https://api.themoviedb.org/3';
@@ -19,7 +18,10 @@ export const fetchPopularAnimes = async (page: number = 1): Promise<PaginatedRes
   try {
     const res = await fetch(
       `${TMDB_URL}/discover/tv?include_adult=false&language=pt-BR&sort_by=popularity.desc&with_genres=16&with_original_language=ja&page=${page}`,
-      { headers }
+      { 
+        headers,
+        cache: 'default' // Permitimos cache normal para dados estáticos do TMDB
+      }
     );
     
     if (!res.ok) throw new Error('Falha ao buscar animes populares');
@@ -35,7 +37,10 @@ export const searchAnimes = async (query: string, page: number = 1): Promise<Pag
   try {
     const res = await fetch(
       `${TMDB_URL}/search/tv?query=${encodeURIComponent(query)}&include_adult=false&language=pt-BR&page=${page}`,
-      { headers }
+      { 
+        headers,
+        cache: 'default' 
+      }
     );
 
     if (!res.ok) throw new Error('Falha ao pesquisar animes');
@@ -58,7 +63,11 @@ export const searchAnimes = async (query: string, page: number = 1): Promise<Pag
 
 export const fetchAnimeDetails = async (id: number): Promise<AnimeDetail | null> => {
   try {
-    const res = await fetch(`${TMDB_URL}/tv/${id}?language=pt-BR`, { headers });
+    const res = await fetch(`${TMDB_URL}/tv/${id}?language=pt-BR`, { 
+      headers,
+      cache: 'default'
+    });
+    
     if (!res.ok) throw new Error('Falha ao buscar detalhes');
     
     return await res.json() as AnimeDetail;
@@ -70,7 +79,11 @@ export const fetchAnimeDetails = async (id: number): Promise<AnimeDetail | null>
 
 export const fetchEpisodes = async (seriesId: number, seasonNumber: number): Promise<Episode[]> => {
   try {
-    const res = await fetch(`${TMDB_URL}/tv/${seriesId}/season/${seasonNumber}?language=pt-BR`, { headers });
+    const res = await fetch(`${TMDB_URL}/tv/${seriesId}/season/${seasonNumber}?language=pt-BR`, { 
+      headers,
+      cache: 'default'
+    });
+    
     if (!res.ok) throw new Error('Falha ao buscar episódios');
     
     const data = await res.json();
@@ -81,12 +94,18 @@ export const fetchEpisodes = async (seriesId: number, seasonNumber: number): Pro
   }
 };
 
-// Consumo do Catálogo Próprio (JSON) flexibilizado com a nova estrutura de rotas
+// Consumo do Catálogo Próprio com Cache Busting (Garante dados sempre frescos após o Mapeamento)
 export const fetchPlayMediaCatalog = async (animeId: number): Promise<PlayMediaCatalog | null> => {
   try {
-    const res = await fetch(`https://luizhanauer.github.io/play-media/${animeId}/episodes.json`);
+    // Adiciona o timestamp na URL para forçar um bypass agressivo no cache da WebView do Telegram
+    const timestamp = new Date().getTime();
+    const url = `https://luizhanauer.github.io/play-media/${animeId}/episodes.json?t=${timestamp}`;
     
-    // Boundary Protection: Retorno silencioso (sem erro fatal) se o JSON não existir
+    const res = await fetch(url, {
+      // Diretiva HTTP padrão para não armazenar cache (funciona em navegadores modernos)
+      cache: 'no-store'
+    });
+    
     if (!res.ok) return null;
     
     return await res.json() as PlayMediaCatalog;
