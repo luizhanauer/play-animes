@@ -116,7 +116,19 @@ const isLoading = ref<boolean>(true);
 const targetSeasonNumber = ref<number>(1);
 
 // Flag de Admin (A validação real ocorre no Bot Go)
-const isAdmin = ref<boolean>(true); 
+const ADMIN_ID = import.meta.env.VITE_ADMIN_TELEGRAM_ID;
+
+const isAdmin = ref<boolean>(false);
+
+const checkAdminStatus = () => {
+  const tg = window.Telegram?.WebApp;
+  
+  if (tg?.initDataUnsafe?.user) {
+    const userId = tg.initDataUnsafe.user.id.toString();
+    // Comparação como string para evitar problemas de tipo com env
+    isAdmin.value = userId === ADMIN_ID;
+  }
+};
 
 // Composição de Dados: Mescla o TMDB com o Catálogo Local
 const mappedEpisodes = computed<MappedEpisode[]>(() => {
@@ -212,5 +224,8 @@ const prepareMapping = (epNumber: number): void => {
   setTimeout(() => tg.close(), 150);
 };
 
-onMounted(loadDetails);
+onMounted(() => {
+  checkAdminStatus();
+  loadDetails();
+});
 </script>
