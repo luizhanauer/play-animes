@@ -116,17 +116,31 @@ const isLoading = ref<boolean>(true);
 const targetSeasonNumber = ref<number>(1);
 
 // Flag de Admin (A validação real ocorre no Bot Go)
-const ADMIN_ID = import.meta.env.VITE_ADMIN_TELEGRAM_ID;
-
 const isAdmin = ref<boolean>(false);
+  
+const ADMIN_ID = import.meta.env.VITE_ADMIN_TELEGRAM_ID;
 
 const checkAdminStatus = () => {
   const tg = window.Telegram?.WebApp;
   
+  // Log 1: O que o Vite injetou na variável de ambiente
+  console.log("[Debug] VITE_ADMIN_TELEGRAM_ID configurado:", ADMIN_ID);
+
   if (tg?.initDataUnsafe?.user) {
     const userId = tg.initDataUnsafe.user.id.toString();
-    // Comparação como string para evitar problemas de tipo com env
-    isAdmin.value = userId === ADMIN_ID;
+    
+    // Log 2: O ID que o Telegram está entregando agora
+    console.log("[Debug] Seu ID atual no Telegram:", userId);
+
+    // Comparação com tratamento de strings
+    const isMatched = userId.trim() === ADMIN_ID?.toString().trim();
+    
+    // Log 3: Resultado da comparação
+    console.log("[Debug] Comparação:", `${userId} === ${ADMIN_ID} ->`, isMatched);
+
+    isAdmin.value = isMatched;
+  } else {
+    console.warn("[Debug] Objeto user não encontrado no initDataUnsafe.");
   }
 };
 
